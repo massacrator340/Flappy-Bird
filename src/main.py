@@ -1,10 +1,13 @@
+"""Main execution script for the Flappy Bird game loop."""
+import sys
+
 import pygame
 
 from background import Ground, Sky
 
 
 def main():
-
+    """Initialize the game engine and manage the real-time event loop."""
     screen_width = 1024
     screen_height = 768
 
@@ -25,7 +28,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
+                sys.exit()
 
         sky.draw()
         ground.update(velocity)
