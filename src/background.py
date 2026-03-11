@@ -6,9 +6,7 @@ import pygame
 class Background:
     """Base class for all background objects in the game."""
 
-    def __init__(
-        self, filename: str, pos_x: int, pos_y: int, screen: pygame.Surface
-    ):
+    def __init__(self, filename: str, pos_x: int, pos_y: int, screen: pygame.Surface):
         """Initialize background with image, position, and screen reference."""
         self.screen = screen
         self.surface = pygame.image.load(f"../assets/Game Objects/{filename}")
