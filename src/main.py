@@ -5,9 +5,8 @@ import sys
 
 import pygame
 
-from background import Ground, Sky
-
 import player
+from background import Ground, Sky
 
 
 def main() -> None:
@@ -30,7 +29,7 @@ def main() -> None:
     ground = Ground(filename_ground, 0, sky.get_height(), screen)
 
     bird_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
-    bird = player.Bird(100, 200)
+    bird = player.Bird(90, 220)
     bird_group.add(bird)
 
     while True:
@@ -39,7 +38,6 @@ def main() -> None:
                 pygame.quit()
                 sys.exit()
 
-            # or pygame.mouse.get_pressed
             if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or (
                 event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
             ):
