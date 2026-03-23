@@ -65,7 +65,7 @@ class Bird(pygame.sprite.Sprite):
         self.gravity += 0.5
         self.rect.y += int(self.gravity)
 
-    def update(self, ground_line: int):
+    def update(self, ground_line: int) -> None:
         """
         Update bird logic every frame if the bird is still alive.
         ground_line indicates the Current Y position of the ground.
@@ -75,5 +75,3 @@ class Bird(pygame.sprite.Sprite):
             if self.fly:
                 self.apply_gravity()
             self.touched_ground(ground_line)
-        else:
-            return self.died
