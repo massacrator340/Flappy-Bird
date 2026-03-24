@@ -1,7 +1,6 @@
 # pylint: disable=no-member
 """Main execution script for the Flappy Bird game loop."""
 
-import random
 import sys
 
 import pygame
@@ -19,7 +18,7 @@ def main() -> None:
     pygame.init()
     screen = pygame.display.set_mode(
         (screen_width * scale, screen_height * scale)
-    )  # scale the screen for better visibility, can be set to 1 for original size
+    )
     pygame.display.set_caption("Flappy Bird")
     clock = pygame.time.Clock()
     fps = 60
