@@ -11,11 +11,12 @@ from background import Ground, Sky
 
 def main() -> None:
     """Initialize the game engine and manage the real-time event loop."""
-    screen_width = 1024
-    screen_height = 768
+    scale = 1.2
+    screen_width = 288
+    screen_height = 512
 
     pygame.init()
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen = pygame.display.set_mode((screen_width * scale, screen_height * scale))
     pygame.display.set_caption("Flappy Bird")
     clock = pygame.time.Clock()
     fps = 60

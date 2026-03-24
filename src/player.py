@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes
 # pylint: disable=no-member
 """Module handling the bird's logic, including physics, animations, and death states."""
 
@@ -24,12 +25,15 @@ class Bird(pygame.sprite.Sprite):
             self.images.append(image)
 
         self.image_index = 0.0
+
+        self.original_image = self.images[int(self.image_index)]
         self.image = self.images[int(self.image_index)]
         self.rect = self.image.get_rect(midbottom=(pos_x, pos_y))
 
         self.gravity = 0.0
         self.fly = False
         self.died = False
+        self.mask = pygame.mask.from_surface(self.image)
 
     def get_state(self) -> states.States:
         """Returns the current states.States member based on bird physics."""
@@ -70,10 +74,25 @@ class Bird(pygame.sprite.Sprite):
 
     def jump(self) -> None:
         """Apply an upward impulse to the bird's gravity."""
-        self.gravity = -8
+        self.gravity = -10
 
     def apply_gravity(self) -> None:
         """Update gravity value and apply it to the bird's vertical position."""
+        self.gravity += 0.5
+        self.rect.y += int(self.gravity)
+
+    def _animate(self) -> None:
+        """Gestisce esclusivamente il cambio dei frame (le ali che battono)."""
+        self.image_index = (self.image_index + 0.12) % len(self.images)
+        self.original_image = self.images[int(self.image_index)]
+
+    def _rotate(self) -> None:
+        """Gestisce esclusivamente l'inclinazione dell'uccellino in base alla velocità."""
+        self.image = pygame.transform.rotate(self.original_image, self.gravity * -3)
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+    def _apply_physics(self) -> None:
+        """Gestisce esclusivamente gravità e spostamento verticale."""
         self.gravity += 0.5
         self.rect.y += int(self.gravity)
 
@@ -82,8 +101,10 @@ class Bird(pygame.sprite.Sprite):
         Update bird logic every frame if the bird is still alive.
         ground_line indicates the Current Y position of the ground.
         """
-        if self.died is False:
-            self.animation()
-            if self.fly:
-                self.apply_gravity()
+        if self.died:
+            return
+        self._animate()
+        if self.fly:
+            self._apply_physics()
+            self._rotate()
             self.touched_ground(ground_line)
