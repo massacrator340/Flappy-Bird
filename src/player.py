@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes
 # pylint: disable=no-member
 """Module handling the bird's logic, including physics, animations, and death states."""
 
@@ -12,7 +13,7 @@ class Bird(pygame.sprite.Sprite):
     Inherits from pygame.sprite.Sprite to utilize Group management.
     """
 
-    def __init__(self, pos_x: int, pos_y: int, scale_factor: float = 1.2) -> None:
+    def __init__(self, pos_x: int, pos_y: int) -> None:
         """Initialize the bird with animations, position (pos_x, pos_y), and physics state."""
         super().__init__()
 
@@ -24,7 +25,7 @@ class Bird(pygame.sprite.Sprite):
             self.images.append(image)
 
         self.image_index = 0.0
-        # for rotation purposes, we keep the original image before any transformations
+        
         self.original_image = self.images[int(self.image_index)]
         self.image = self.images[int(self.image_index)]
         self.rect = self.image.get_rect(midbottom=(pos_x, pos_y))
@@ -74,7 +75,7 @@ class Bird(pygame.sprite.Sprite):
         """Apply an upward impulse to the bird's gravity."""
         self.gravity = (
             -10
-        )  # optimal value for the jump height, can be tweaked for different feel
+        )  
 
     def apply_gravity(self) -> None:
         """Update gravity value and apply it to the bird's vertical position."""
@@ -88,9 +89,7 @@ class Bird(pygame.sprite.Sprite):
 
     def _rotate(self) -> None:
         """Gestisce esclusivamente l'inclinazione dell'uccellino in base alla velocità."""
-        # L'angolo è una funzione della gravità (velocità verticale)
         self.image = pygame.transform.rotate(self.original_image, self.gravity * -3)
-        # Importante: ricalcoliamo il rect per evitare l'effetto "vibrazione" durante la rotazione
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def _apply_physics(self) -> None:
@@ -104,16 +103,13 @@ class Bird(pygame.sprite.Sprite):
         ground_line indicates the Current Y position of the ground.
         """
         if self.died:
-            return  # Skip all updates if the bird is dead, it should just fall to the ground and stop there
-        self._animate()  # Update the animation frame
-
-        # if the bird is flying, we apply gravity and rotation, otherwise we just update the animation (for the idle state)
+            return  
+        self._animate()  
         if self.fly:
-            self._apply_physics()  # Update gravity and vertical position
-            self._rotate()  # Update the bird's rotation based on its vertical speed
+            self._apply_physics() 
+            self._rotate() 
             self.touched_ground(
                 ground_line
-            )  # Check if the bird has touched the ground and update state accordingly
+            )
 
-        # reload the mask for pixel-perfect collision detection
-        self.mask = pygame.mask.from_surface(self.image)
+            self.mask = pygame.mask.from_surface(self.image)
