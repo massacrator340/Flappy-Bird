@@ -1,5 +1,7 @@
-"""Module containing classes to manage 
+"""Module containing classes to manage
 game background elements like Sky and Ground."""
+
+# pylint: disable=too-many-locals
 
 import pygame
 

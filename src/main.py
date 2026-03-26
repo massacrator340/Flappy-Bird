@@ -1,6 +1,8 @@
 # pylint: disable=no-member
 """Main execution script for the Flappy Bird game loop."""
 
+# pylint: disable=too-many-locals
+
 import sys
 
 import pygame
@@ -46,9 +48,9 @@ def main() -> None:
     bird = player.Bird(90, 220)
     bird_group.add(bird)
 
-    GameLoop = True
+    game_loop = True
 
-    while GameLoop == True:
+    while game_loop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
