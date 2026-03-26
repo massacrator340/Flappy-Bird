@@ -11,7 +11,7 @@ class Background:
     def __init__(self, filename: str, pos_x: int, pos_y: int, screen: pygame.Surface):
         """Initialize background with image, position, and screen reference."""
         self.screen = screen
-        self.surface = pygame.image.load(f"../assets/Game Objects/{filename}")
+        self.surface = pygame.image.load(f"../assets/Game Objects/{filename}").convert_alpha()
         self.width = self.surface.get_width()
         self.height = self.surface.get_height()
         self.pos_x = pos_x
