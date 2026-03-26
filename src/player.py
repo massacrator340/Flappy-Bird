@@ -79,7 +79,7 @@ class Bird(pygame.sprite.Sprite):
 
     def jump(self) -> None:
         """Apply an upward impulse to the bird's gravity."""
-        self.gravity = -10
+        self.gravity = -7
 
     def apply_gravity(self) -> None:
         """Update gravity value and apply it to the bird's vertical position."""
