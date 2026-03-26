@@ -83,7 +83,7 @@ class Bird(pygame.sprite.Sprite):
 
     def _animate(self) -> None:
         """Exclusively handles frame transitions for the wing-flapping animation."""
-        self.image_index = (self.image_index + 0.12) % len(self.images)
+        self.image_index = (self.image_index + 0.40) % len(self.images)
         self.original_image = self.images[int(self.image_index)]
 
     def _rotate(self) -> None:
