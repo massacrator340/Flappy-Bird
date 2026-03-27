@@ -72,3 +72,29 @@ def test_bird_state_transitions():
     
     bird.die()
     assert bird.get_state() == States.GROUNDED
+
+def test_pipe_movement():
+    """Ensures the pipe correctly updates its x-coordinate."""
+    pipe_instance = pipe.Pipe(300, 200, 0, 100)
+    initial_x = pipe_instance.rect.x
+    velocity = 5
+    pipe_instance.update(velocity, States.FLYING)
+    assert pipe_instance.rect.x == initial_x - velocity
+
+def test_pipe_scoring_logic():
+    """Validates the scoring boundary logic."""
+    pipe_instance = pipe.Pipe(100, 200, 0, 100)
+    pipe_instance.rect.centerx = 100
+    has_passed = pipe_instance.check_passed(110)
+    assert has_passed is True
+    assert pipe_instance.passed is True
+
+def test_ground_scrolling():
+    """Verifies the parallax ground object scrolls correctly."""
+    mock_screen = MagicMock(spec=pygame.Surface)
+    ground = background.Ground("base.png", 0, 500, mock_screen)
+    ground.width = 700 
+    initial_x = ground.pos_x
+    velocity = 10
+    ground.update(velocity, States.FLYING)
+    assert ground.pos_x == initial_x - velocity
