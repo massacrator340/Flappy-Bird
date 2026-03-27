@@ -5,8 +5,10 @@ import pygame
 import background
 import pipe
 import player
+import ui
 from states import States
 import score
+
 
 # --- GLOBAL FIXTURES ---
 
@@ -16,6 +18,7 @@ def mock_pygame_essentials():
     Global fixture to mock Pygame's core functionalities, including Fonts.
     """
     with patch("pygame.image.load") as mock_load, \
+         patch("ui.pygame.image.load") as mock_load_ui, \
          patch("pygame.mask.from_surface") as mock_mask, \
          patch("pygame.transform.rotate") as mock_rotate, \
          patch("pygame.transform.flip") as mock_flip, \
@@ -37,6 +40,7 @@ def mock_pygame_essentials():
         
         # Configurazione ritorni
         mock_load.return_value.convert_alpha.return_value = mock_surface
+        mock_load_ui.return_value.convert_alpha.return_value = mock_surface
         mock_rotate.return_value = mock_surface
         mock_flip.return_value = mock_surface
         mock_mask.return_value = MagicMock()
@@ -240,3 +244,54 @@ def test_score_draw_call():
     s = score.Score("font1", "font2", 100, 100)
     s.draw(mock_screen) 
     assert mock_screen.blit.called
+
+def test_start_screen_fade_out():
+    """Validates that the start screen fades out when the bird starts flying."""
+    start_screen = ui.StartScreen("message.png", 150, 305, 255)
+    initial_alpha = start_screen.transparency
+    
+    # Mock surface to simulate drawing
+    mock_canvas = MagicMock(spec=pygame.Surface)
+    
+    # Act: simulate drawing while bird is FLYING
+    start_screen.draw(States.FLYING, mock_canvas)
+    
+    # Assert: transparency should have decreased and blit should have been called
+    assert start_screen.transparency < initial_alpha
+    assert mock_canvas.blit.called
+
+def test_game_over_screen_fade_in():
+    """Validates that the game over screen fades in when the bird is grounded."""
+    go_screen = ui.GameOverScreen("gameover.png", 150, 305, 0)
+    initial_alpha = go_screen.transparency
+    
+    # Mock surface to simulate drawing
+    mock_canvas = MagicMock(spec=pygame.Surface)
+    
+    # Act: simulate drawing while bird is GROUNDED
+    go_screen.draw(States.GROUNDED, mock_canvas)
+    
+    # Assert: transparency should have increased
+    assert go_screen.transparency > initial_alpha
+    assert mock_canvas.blit.called
+
+def test_game_reset_logic_v2():
+    """Updated test for reset_game to include new bird state variables from main.py."""
+    from main import reset_game
+    bird = player.Bird(100, 200)
+    
+    # Force 'dirty' state
+    bird.died = True
+    bird.gravity = 10
+    bird.is_rotated_to_death = True
+    pipe_group = pygame.sprite.Group()
+    pipe_group.add(pipe.Pipe(300, 200, 0, 100))
+    
+    # Act
+    reset_game(bird, pipe_group)
+    
+    # Assert: all new and old variables should be reset
+    assert bird.died is False
+    assert bird.gravity == 0
+    assert bird.is_rotated_to_death is False
+    assert len(pipe_group) == 0
