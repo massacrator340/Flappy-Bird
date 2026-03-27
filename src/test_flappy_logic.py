@@ -57,3 +57,18 @@ def test_bird_jump_gravity_update():
     
     # Assert (Post-Action State)
     assert bird.gravity == -7
+
+def test_bird_state_transitions():
+    """
+    Verifies the bird's state machine transitions during a standard lifecycle:
+    from READY to FLYING, and halting at GROUNDED upon collision.
+    """
+    bird = player.Bird(100, 200)
+    
+    assert bird.get_state() == States.READY
+    
+    bird.enable_fly()
+    assert bird.get_state() == States.FLYING
+    
+    bird.die()
+    assert bird.get_state() == States.GROUNDED
