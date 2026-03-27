@@ -80,10 +80,13 @@ def main() -> None:
             if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or (
                 event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
             ):
-                bird.enable_fly()
-                bird.jump()
+                if not bird.died:
+                    bird.enable_fly()
+                    bird.jump()
 
         bird_state = bird.get_state()
+        if pygame.sprite.spritecollide(bird, pipe_group, False, pygame.sprite.collide_mask):
+            bird.die()
 
         # Draw the game elements on the canvas
         sky.draw()
