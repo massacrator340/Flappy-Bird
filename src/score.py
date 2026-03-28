@@ -17,7 +17,7 @@ class Score:
         self.pos_x = pos_x
         self.pos_y = pos_y
 
-    def reset_value(self):
+    def reset(self):
         """Reset the current score value to zero."""
         self.value = 0
 
