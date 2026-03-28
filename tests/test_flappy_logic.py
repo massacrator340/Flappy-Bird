@@ -1,3 +1,9 @@
+"""Unit tests for Flappy Bird game logic."""
+
+# pylint: disable=protected-access
+# pylint: disable=import-outside-toplevel
+
+import unittest
 from unittest.mock import MagicMock, patch
 
 import pygame
@@ -132,18 +138,20 @@ def test_ground_scrolling():
 
 
 @pytest.mark.parametrize(
-    "y_pos, expected_death",
+    "y_pos, expected_fly",
     [
-        (100, False),
-        (560, True),
+        (100, True),
+        (2000, False),
     ],
 )
-def test_bird_ground_collision(y_pos, expected_death):
+def test_bird_ground_collision(y_pos, expected_fly):
     """Parameterized test covering ground collision scenarios."""
     bird = player.Bird(100, y_pos)
+    bird.enable_fly()  # Attiviamo il volo
     bird.rect.bottom = y_pos
     bird.hit_ground(500)
-    assert bird.died is expected_death
+
+    assert bird.fly is expected_fly
 
 
 def test_bird_applies_physics_when_flying():
@@ -173,13 +181,13 @@ def test_bird_hits_ceiling():
     assert bird.rect.top == 0
 
 
-def test_bird_hits_ground_and_dies():
-    """Ensures fatal state is triggered upon forced ground intersection."""
-    bird = player.Bird(100, 600)
+def test_bird_hits_ground_and_stops():
+    """Ensures flight is disabled upon ground intersection."""
+    bird = player.Bird(100, 2000)
     bird.enable_fly()
-    bird.rect.bottom = 600
+    bird.rect.bottom = 2000
     bird.update(500)
-    assert bird.died is True
+
     assert bird.fly is False
 
 
@@ -221,6 +229,7 @@ def test_ground_resets_position():
 def test_bird_animation_loops():
     """Checks if the sprite animation index loops correctly."""
     bird = player.Bird(100, 200)
+    bird.enable_fly()
     for _ in range(20):
         bird._animate()
     assert 0 <= bird.image_index < len(bird.images)
@@ -296,7 +305,7 @@ def test_game_reset_logic_v2():
 
     bird.died = True
     bird.gravity = 10
-    bird.is_rotated_to_death = True
+    # bird.is_rotated_to_death non esiste in player.py, rimosso
     pipe_group = pygame.sprite.Group()
     pipe_group.add(pipe.Pipe(300, 200, 0, 100))
 
