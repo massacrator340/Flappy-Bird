@@ -1,4 +1,5 @@
 """Module containing game state management and reset logic."""
+
 import pygame
 
 import player
@@ -16,7 +17,7 @@ def reset_game(
     """
     Reset all game entities to their initial states for a new match.
 
-    This function restores the UI screens' transparency, resets the bird's 
+    This function restores the UI screens' transparency, resets the bird's
     position and physics, clears all pipes from the screen, and resets the score.
     """
     start_screen.reset()
