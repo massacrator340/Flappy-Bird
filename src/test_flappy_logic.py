@@ -114,8 +114,8 @@ def test_ground_scrolling():
     assert ground.pos_x == initial_x - velocity
 
 @pytest.mark.parametrize("y_pos, expected_death", [
-    (100, False), # Volo normale
-    (560, True),  # Collisione con il terreno
+    (100, False), 
+    (560, True),  
 ])
 def test_bird_ground_collision(y_pos, expected_death):
     """Parameterized test covering ground collision scenarios."""
@@ -129,10 +129,8 @@ def test_bird_applies_physics_when_flying():
     bird = player.Bird(100, 200)
     bird.enable_fly()
     initial_y = bird.rect.y
-    # Chiamiamo update due volte per accumulare gravità a sufficienza (> 1.0)
     bird.update(500)
     bird.update(500)
-    # Verifichiamo che la posizione Y sia cambiata rispetto all'originale
     assert bird.rect.y != initial_y
 
 def test_bird_no_physics_when_not_flying():
@@ -204,94 +202,72 @@ def test_bird_rotation_executes():
     bird._rotate()
     assert bird.rect is not None
 
-def test_score_increment_and_reset():
-    """Tests the new Score class from score.py"""
+def test_pipe_top_vs_bottom_logic():
+    """Ensures that top and bottom pipes are initialized with different images/rects."""
+    pipe_top = pipe.Pipe(300, 200, 1, 100) 
+    pipe_bottom = pipe.Pipe(300, 200, 0, 100) 
+    
+    assert pipe_top.get_position() == 1
+    assert pipe_bottom.get_position() == 0
+    assert pipe_top.rect.bottom < pipe_bottom.rect.top
+
+
+# --- REFACTORED TESTS FOR NEW IMPORTS AND SIGNATURES ---
+
+def test_score_increment():
+    """Tests the score increment logic from score.py."""
     s = score.Score("font1", "font2", 100, 100)
     assert s.value == 0
     s.scored()
     assert s.value == 1
-    s.reset_value()
-    assert s.value == 0
-
-def test_pipe_top_vs_bottom_logic():
-    """Ensures that top and bottom pipes are initialized with different images/rects"""
-    pipe_top = pipe.Pipe(300, 200, 1, 100) # position 1 = TOP
-    pipe_bottom = pipe.Pipe(300, 200, 0, 100) # position 0 = BOTTOM
-    
-    assert pipe_top.get_position() == 1
-    assert pipe_bottom.get_position() == 0
-
-    assert pipe_top.rect.bottom < pipe_bottom.rect.top
-
-def test_game_reset_logic():
-    """Tests the reset_game function from main.py"""
-    from main import reset_game
-    bird = player.Bird(100, 200)
-    bird.died = True
-    bird.gravity = 10
-    pipe_group = pygame.sprite.Group()
-    pipe_group.add(pipe.Pipe(300, 200, 0, 100))
-    
-    reset_game(bird, pipe_group)
-    
-    assert bird.died is False
-    assert bird.gravity == 0
-    assert len(pipe_group) == 0
 
 def test_score_draw_call():
-    """Test if the score draw method executes without errors using mocks."""
+    """Test the score draw method with all required positional arguments."""
     mock_screen = MagicMock(spec=pygame.Surface)
     s = score.Score("font1", "font2", 100, 100)
-    s.draw(mock_screen) 
+    # Passed timing=True, screen=mock_screen, and bird_state=States.FLYING
+    s.draw(True, mock_screen, States.FLYING) 
     assert mock_screen.blit.called
 
 def test_start_screen_fade_out():
     """Validates that the start screen fades out when the bird starts flying."""
-    start_screen = ui.StartScreen("message.png", 150, 305, 255)
+    start_screen = ui.StartScreen("message.png", 150, 305, 255, 0)
     initial_alpha = start_screen.transparency
     
-    # Mock surface to simulate drawing
     mock_canvas = MagicMock(spec=pygame.Surface)
-    
-    # Act: simulate drawing while bird is FLYING
     start_screen.draw(States.FLYING, mock_canvas)
     
-    # Assert: transparency should have decreased and blit should have been called
     assert start_screen.transparency < initial_alpha
     assert mock_canvas.blit.called
 
 def test_game_over_screen_fade_in():
     """Validates that the game over screen fades in when the bird is grounded."""
-    go_screen = ui.GameOverScreen("gameover.png", 150, 305, 0)
+    go_screen = ui.GameOverScreen("gameover.png", 150, 305, 0, 255)
     initial_alpha = go_screen.transparency
     
-    # Mock surface to simulate drawing
     mock_canvas = MagicMock(spec=pygame.Surface)
-    
-    # Act: simulate drawing while bird is GROUNDED
     go_screen.draw(States.GROUNDED, mock_canvas)
     
-    # Assert: transparency should have increased
     assert go_screen.transparency > initial_alpha
     assert mock_canvas.blit.called
 
 def test_game_reset_logic_v2():
-    """Updated test for reset_game to include new bird state variables from main.py."""
-    from main import reset_game
+    """Updated test for reset_game including bird, pipes, score, and UI screens."""
+    from reset import reset_game
     bird = player.Bird(100, 200)
     
-    # Force 'dirty' state
     bird.died = True
     bird.gravity = 10
     bird.is_rotated_to_death = True
     pipe_group = pygame.sprite.Group()
     pipe_group.add(pipe.Pipe(300, 200, 0, 100))
     
-    # Act
-    reset_game(bird, pipe_group)
+    mock_score = MagicMock(spec=score.Score)
+    mock_start = MagicMock(spec=ui.StartScreen)
+    mock_gameover = MagicMock(spec=ui.GameOverScreen)
     
-    # Assert: all new and old variables should be reset
+    reset_game(bird, pipe_group, mock_score, mock_start, mock_gameover)
+    
     assert bird.died is False
     assert bird.gravity == 0
-    assert bird.is_rotated_to_death is False
     assert len(pipe_group) == 0

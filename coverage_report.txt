@@ -2,9 +2,9 @@
 platform win32 -- Python 3.14.3, pytest-9.0.2, pluggy-1.6.0
 rootdir: C:\Users\SaraO\Desktop\progetto_qd\Flappy-Bird
 plugins: cov-7.1.0, mock-3.15.1
-collected 24 items
+collected 23 items
 
-src\test_flappy_logic.py ........................                        [100%]
+src\test_flappy_logic.py .......................                         [100%]
 
 =============================== tests coverage ================================
 _______________ coverage: platform win32, python 3.14.3-final-0 _______________
@@ -12,13 +12,15 @@ _______________ coverage: platform win32, python 3.14.3-final-0 _______________
 Name                       Stmts   Miss  Cover
 ----------------------------------------------
 src\background.py             36      4    89%
-src\main.py                   89     72    19%
+src\main.py                   73     73     0%
 src\pipe.py                   32      0   100%
-src\player.py                 84     10    88%
-src\score.py                  19      0   100%
+src\player.py                 90     10    89%
+src\reset.py                  10      0   100%
+src\score.py                  21      1    95%
+src\settings.py               32     32     0%
 src\states.py                 10      0   100%
-src\test_flappy_logic.py     184      1    99%
-src\ui.py                     34      2    94%
+src\test_flappy_logic.py     173      1    99%
+src\ui.py                     40      5    88%
 ----------------------------------------------
-TOTAL                        488     89    82%
-============================= 24 passed in 0.14s ==============================
+TOTAL                        517    126    76%
+============================= 23 passed in 0.14s ==============================
