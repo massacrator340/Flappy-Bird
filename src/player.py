@@ -130,7 +130,7 @@ class Bird(pygame.sprite.Sprite):
         if self.died:
             angle = -90
         else:
-            angle = int(max(min(self.gravity * -3, 25), -90))
+            angle = int(max(min(self.gravity * -8, 25), -90))
 
         self.image = pygame.transform.rotate(self.original_image, angle)
         self.rect = self.image.get_rect(center=self.rect.center)
