@@ -4,8 +4,8 @@
 
 import pygame
 
-import states
 import settings
+import states
 
 
 class Bird(pygame.sprite.Sprite):
@@ -31,7 +31,7 @@ class Bird(pygame.sprite.Sprite):
         self.image = self.original_image
 
         assert isinstance(self.image, pygame.Surface)
-        
+
         self.rect = self.image.get_rect(midbottom=(pos_x, pos_y))
 
         self.gravity = 0.0

@@ -106,7 +106,6 @@ def main() -> None:
             if bird.is_dead() and (
                 (event.type == pygame.KEYDOWN and event.key == pygame.K_r)
                 or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 3)
-                
             ):
                 sfx_swoosh.play()
                 reset.reset_game(
@@ -139,7 +138,6 @@ def main() -> None:
                     sfx_wing.play()
                     bird.enable_fly()
                     bird.jump()
-
 
         # --- B. Game Logic & Collisions ---
         bird_state = bird.get_state()
