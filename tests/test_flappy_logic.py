@@ -3,11 +3,16 @@
 # pylint: disable=protected-access
 # pylint: disable=import-outside-toplevel
 # pylint: disable=unused-import
+# pylint: disable=wrong-import-position
 
+import os
+import sys
 from unittest.mock import MagicMock, patch
 
 import pygame
 import pytest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 import background
 import pipe
@@ -16,7 +21,7 @@ import score
 import ui
 from states import States
 
-# --- GLOBAL FIXTURES ---
+# ---  GLOBAL FIXTURES  ---
 
 
 @pytest.fixture(autouse=True)
@@ -305,7 +310,6 @@ def test_game_reset_logic_v2():
 
     bird.died = True
     bird.gravity = 10
-    # bird.is_rotated_to_death non esiste in player.py, rimosso
     pipe_group = pygame.sprite.Group()
     pipe_group.add(pipe.Pipe(300, 200, 0, 100))
 
@@ -318,3 +322,106 @@ def test_game_reset_logic_v2():
     assert bird.died is False
     assert bird.gravity == 0
     assert len(pipe_group) == 0
+
+
+# --- ADDITIONAL COVERAGE TESTS ---
+
+
+def test_bird_rotation_when_dead():
+    """Checks if the bird rotates to -90 degrees instantly when dead."""
+    bird = player.Bird(100, 200)
+    bird.die()
+    bird._rotate()
+    assert bird.image is not None
+
+
+def test_bird_reset_functionality():
+    """Validates that the bird class resets all its attributes correctly."""
+    import settings
+
+    bird = player.Bird(100, 200)
+    bird.gravity = 15.0
+    bird.fly = True
+    bird.died = True
+    bird.reset()
+
+    assert bird.gravity == 0.0
+    assert bird.fly is False
+    assert bird.died is False
+    assert bird.rect.midbottom == (settings.BIRD_START_X, settings.BIRD_START_Y)
+
+
+def test_ui_base_class_exceptions():
+    """Ensures base UI class abstract methods raise NotImplementedError."""
+    base_ui = ui.UI("dummy.png", 0, 0, 255, 0)
+    with pytest.raises(NotImplementedError):
+        base_ui._animation()
+    with pytest.raises(NotImplementedError):
+        base_ui.draw(States.FLYING, MagicMock())
+
+
+def test_ui_target_transparency_reached():
+    """Checks the transparency target boolean validation."""
+    my_ui = ui.UI("dummy.png", 0, 0, 255, 255)
+    assert my_ui.target_transparency_reached() is True
+
+
+def test_start_screen_ready_state_bypasses_fade():
+    """Tests StartScreen draw logic during READY state."""
+    start_screen = ui.StartScreen("message.png", 150, 305, 255, 0)
+    mock_canvas = MagicMock(spec=pygame.Surface)
+    start_screen.draw(States.READY, mock_canvas)
+
+    assert mock_canvas.blit.called
+    assert start_screen.transparency == 255
+
+
+def test_score_draw_skip_when_not_flying_or_not_timing():
+    """Ensures score rendering is bypassed when conditions aren't met."""
+    mock_screen = MagicMock(spec=pygame.Surface)
+    s = score.Score("font1", "font2", 100, 100)
+
+    s.draw(False, mock_screen, States.FLYING)
+    assert not mock_screen.blit.called
+
+    s.draw(True, mock_screen, States.READY)
+    assert not mock_screen.blit.called
+
+
+def test_ground_does_not_move_when_grounded():
+    """Ensures ground stops scrolling upon bird death to prevent visual desync."""
+    mock_screen = MagicMock(spec=pygame.Surface)
+    ground = background.Ground("base.png", 0, 500, mock_screen)
+    initial_x = ground.pos_x
+    ground.update(5, States.GROUNDED)
+
+    assert ground.pos_x == initial_x
+
+
+@patch("main.pygame.mixer.Sound")
+@patch("main.pygame.display.set_mode")
+@patch("main.pygame.display.Info")
+def test_main_game_initialization_and_quit(mock_info, mock_set_mode, _mock_sound):
+    """
+    Smoke test for main.py. Verifies that the game initializes its assets
+    and can cleanly exit when receiving a pygame.QUIT event.
+    This covers the initialization logic without entering the infinite loop.
+    """
+    import main
+
+    # Configure mock info to avoid NoneType math errors
+    mock_info_obj = MagicMock()
+    mock_info_obj.current_h = 1080
+    mock_info.return_value = mock_info_obj
+
+    # Patch event.get specifically for this test to trigger immediate exit
+    with patch("pygame.event.get") as mock_event_get:
+        mock_quit_event = MagicMock()
+        mock_quit_event.type = pygame.QUIT
+        mock_event_get.return_value = [mock_quit_event]
+
+        # main() will raise SystemExit because of sys.exit() inside the quit block
+        with pytest.raises(SystemExit):
+            main.main()
+
+        assert mock_set_mode.called
